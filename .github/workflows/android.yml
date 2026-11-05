@@ -20,21 +20,18 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
-
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-      continue-on-error: true
-
-    - name: Build Debug APK with Gradle
-      run: ./gradlew assembleDebug
-      continue-on-error: true
-
-    - name: Fallback Build if Wrapper Missing
-      run: |
-        gradle assembleDebug
-      continue-on-error: true
+    - name: Build with Gradle
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: 29
+        target: default
+        arch: x86_64
+        disable-animations: true
+        force-avd-creation: false
+        cores: 4
+        ram-size: 3048M
+        working-directory: .
+        script: ./gradlew assembleDebug
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
