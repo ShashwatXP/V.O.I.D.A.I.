@@ -1,0 +1,9 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Void Cyberpunk Pitch Black & Blood Red Theme -->
+    <style name="Theme.VoidAdmin" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">#dc2626</item> <!-- Blood Red -->
+        <item name="colorSecondary">#ef4444</item>
+        <item name="android:windowBackground">#05050a</item> <!-- Pitch Black -->
+        <item name="android:statusBarColor">#05050a</item>
+    </style>
+</resources>
