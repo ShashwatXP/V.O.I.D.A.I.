@@ -20,14 +20,49 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
-
-    - name: Build APK with Gradle
+    - name: Configure Gradle & Build APK
       run: |
-        export ANDROID_HOME=$ANDROID_SDK_ROOT
-        echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
-        gradle assembleDebug || ./gradlew assembleDebug
+        export ANDROID_HOME=/usr/local/lib/android/sdk
+        export ANDROID_SDK_ROOT=/usr/local/lib/android/sdk
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null || true
+        echo "sdk.dir=$ANDROID_HOME" > local.properties
+
+        cat << 'EOF' > gradle.properties
+        org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
+        android.useAndroidX=true
+        android.enableJetifier=true
+        EOF
+
+        cat << 'EOF' > settings.gradle.kts
+        pluginManagement {
+            repositories {
+                google()
+                mavenCentral()
+                gradlePluginPortal()
+            }
+            plugins {
+                id("com.android.application") version "8.2.2"
+                id("org.jetbrains.kotlin.android") version "1.9.22"
+            }
+        }
+        dependencyResolutionManagement {
+            repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+            repositories {
+                google()
+                mavenCentral()
+            }
+        }
+        rootProject.name = "VoidAI"
+        include(":app")
+        EOF
+
+        sed -i 's/@mipmap\/ic_launcher_round/@android:drawable\/sym_def_app_icon/g' app/src/main/AndroidManifest.xml
+        sed -i 's/@mipmap\/ic_launcher/@android:drawable\/sym_def_app_icon/g' app/src/main/AndroidManifest.xml
+        sed -i 's/@style\/Theme.AppCompat.NoActionBar/@style\/Theme.VoidAdmin/g' app/src/main/AndroidManifest.xml
+
+        wget -q https://services.gradle.org/distributions/gradle-8.7-bin.zip -O /tmp/gradle.zip
+        unzip -q /tmp/gradle.zip -d /tmp
+        /tmp/gradle-8.7/bin/gradle assembleDebug
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
