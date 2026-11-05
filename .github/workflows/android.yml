@@ -31,7 +31,7 @@ jobs:
         cores: 4
         ram-size: 3048M
         working-directory: .
-        script: ./gradlew assembleDebug
+        script: gradle assembleDebug
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
