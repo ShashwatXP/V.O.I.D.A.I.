@@ -20,9 +20,14 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Build APK with Native Gradle
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Build APK with Gradle
       run: |
-        yes | sdkmanager --licenses || true
+        export ANDROID_HOME=$ANDROID_SDK_ROOT
+        echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
+        cd app
         gradle assembleDebug || ./gradlew assembleDebug
 
     - name: Upload APK Artifact
