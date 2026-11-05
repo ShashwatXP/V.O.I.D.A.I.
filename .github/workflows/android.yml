@@ -20,18 +20,14 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Build with Gradle
-      uses: reactivecircus/android-emulator-runner@v2
-      with:
-        api-level: 29
-        target: default
-        arch: x86_64
-        disable-animations: true
-        force-avd-creation: false
-        cores: 4
-        ram-size: 3048M
-        working-directory: .
-        script: gradle assembleDebug
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Build APK with Gradle
+      run: |
+        export ANDROID_HOME=$ANDROID_SDK_ROOT
+        echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
+        gradle assembleDebug || ./gradlew assembleDebug
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
